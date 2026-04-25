@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import pdfParse from "pdf-parse";
 import { RoastResponse } from "@/types";
 
 const client = new Anthropic();
@@ -44,9 +45,6 @@ async function extractText(file: File): Promise<string> {
   }
 
   if (name.endsWith(".pdf")) {
-    // Import from lib/ to avoid pdf-parse auto-running its test suite on load
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const pdfParse = require("pdf-parse/lib/pdf-parse");
     const data = await pdfParse(bytes);
     if (!data.text.trim()) {
       throw new Error("Could not extract text from this PDF. Try saving it as a TXT file.");
