@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
-import pdfParse from "pdf-parse";
+import { extractText } from "unpdf";
 import { RoastResponse } from "@/types";
 
 const client = new Anthropic();
@@ -45,11 +45,11 @@ async function extractText(file: File): Promise<string> {
   }
 
   if (name.endsWith(".pdf")) {
-    const data = await pdfParse(bytes);
-    if (!data.text.trim()) {
+    const { text } = await extractText(new Uint8Array(bytes));
+    if (!text.trim()) {
       throw new Error("Could not extract text from this PDF. Try saving it as a TXT file.");
     }
-    return data.text;
+    return text;
   }
 
   if (name.endsWith(".docx")) {
